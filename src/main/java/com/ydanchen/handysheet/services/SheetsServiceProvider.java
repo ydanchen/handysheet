@@ -21,12 +21,12 @@ import java.io.InputStreamReader;
 /**
  * This class creates an authorized Sheets API client service.
  */
-public class SheetServiceProvider {
+public class SheetsServiceProvider {
     /**
      * Directory to store user credentials for this application.
      */
     private static final java.io.File DATA_STORE_DIR = new java.io.File(
-            System.getProperty("user.home"), ".credentials/sheets.googleapis.com-java-quickstart");
+            System.getProperty("user.home"), ".credentials/sheets.googleapis.com-handysheet");
 
     /**
      * Global instance of the scopes required by this quickstart.
