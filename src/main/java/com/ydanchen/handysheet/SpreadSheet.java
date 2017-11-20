@@ -25,7 +25,7 @@ public class SpreadSheet {
     /**
      * Constructor
      *
-     * @param builder com.ydanchen.handysheets.apps.spreadsheet.SpreadSheet Builder
+     * @param builder {@link Builder}
      */
     private SpreadSheet(Builder builder) {
         this.service = builder.service;
@@ -73,7 +73,7 @@ public class SpreadSheet {
      * Range should be specified before
      *
      * @param values the values to set
-     * @return {@see UpdateValuesResponse}
+     * @return {@link UpdateValuesResponse}
      * @throws IOException might be thrown
      */
     public UpdateValuesResponse updateValues(final List<List<Object>> values) throws IOException {
@@ -84,7 +84,7 @@ public class SpreadSheet {
      * Update values on the spreadsheet from the two dimensional array
      *
      * @param values the values to set
-     * @return {@see UpdateValuesResponse}
+     * @return {@link UpdateValuesResponse}
      * @throws IOException might be thrown
      */
     public UpdateValuesResponse updateValues(Object[][] values) throws IOException {
@@ -102,7 +102,7 @@ public class SpreadSheet {
      * @param inheritFromBefore true to inherit range properties from dimension before,
      *                          false to inherit range properties from dimension after.
      *                          Can't be true if startIndex is 0!
-     * @return {@see BatchUpdateSpreadsheetResponse}
+     * @return {@link BatchUpdateSpreadsheetResponse}
      * @throws IOException might be thrown
      */
     public BatchUpdateSpreadsheetResponse insertRows(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
@@ -117,7 +117,7 @@ public class SpreadSheet {
      * @param inheritFromBefore true to inherit range properties from dimension before,
      *                          false to inherit range properties from dimension after
      *                          Can't be true if startIndex is 0!
-     * @return {@see BatchUpdateSpreadsheetResponse}
+     * @return {@link BatchUpdateSpreadsheetResponse}
      * @throws IOException might be thrown
      */
     public BatchUpdateSpreadsheetResponse insertColumns(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
@@ -200,7 +200,7 @@ public class SpreadSheet {
      * @param startIndex        start index
      * @param endIndex          end index
      * @param inheritFromBefore true to inherit
-     * @return {@see BatchUpdateSpreadsheetResponse}
+     * @return {@link BatchUpdateSpreadsheetResponse}
      * @throws IOException will be thrown if occurs
      */
     private BatchUpdateSpreadsheetResponse insertRowsColumnsApiCall(String dimension, int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
@@ -222,7 +222,7 @@ public class SpreadSheet {
      * Update values on the sheet
      *
      * @param values the values to write
-     * @return {@see UpdateValuesResponse}
+     * @return {@link UpdateValuesResponse}
      * @throws IOException will be thrown if occurs
      */
     private UpdateValuesResponse updateValuesApiCall(List<List<Object>> values) throws IOException {

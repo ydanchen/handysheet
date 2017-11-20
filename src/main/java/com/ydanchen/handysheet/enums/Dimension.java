@@ -3,7 +3,7 @@ package com.ydanchen.handysheet.enums;
 /**
  * Spreadsheet Dimensions enum
  *
- * @url: https://developers.google.com/sheets/api/reference/rest/v4/Dimension
+ * @link https://developers.google.com/sheets/api/reference/rest/v4/Dimension
  */
 public enum Dimension {
     /**
@@ -19,7 +19,7 @@ public enum Dimension {
     private final String value;
 
     /**
-     * Sonctructor
+     * Constructor
      *
      * @param value the value of the enum
      */
