@@ -135,7 +135,11 @@ public class SpreadSheet {
         private final Sheets service;
         private String spreadsheetId;
         private String range;
-        private InputOptionValue inputOptionValue;
+        /**
+         * Default value is set to USER_ENTERED
+         * See {@link InputOptionValue} for details
+         */
+        private InputOptionValue inputOptionValue = InputOptionValue.USER_ENTERED;
 
         /**
          * Constructor

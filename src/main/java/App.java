@@ -24,11 +24,21 @@ public class App {
          */
         Sheets service = SheetsServiceProvider.createSheetsService("My Application");
 
+        // Prepare some values
+        Object[][] values = {
+                {"A1", "B1", "C1"},
+                {"A2", "B2", "C2"},
+                {"A3", "B3", "C3"}
+        };
+
         // Create a spreadsheet
         SpreadSheet sheet = new SpreadSheet.Builder(service)
                 .withId(TEST_SHEET)
-                .inRange("Sheet1!A1:A2")
+                .inRange("Sheet1!A1:C3")
                 .build();
+
+        // Write values to the sheet
+        sheet.updateValues(values);
 
         // Insert one blank row at the top of sheet
         sheet.insertRows(0, 1, false);
