@@ -86,11 +86,11 @@ public class SpreadSheet {
         //TODO: TBD
     }
 
-    public void insertRows(final int startIndex, final int endIndex, final boolean inheritFromBefore) throws IOException {
+    public void insertRows(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
         insertRowsColumns(Dimension.ROWS.getValue(), startIndex, endIndex, inheritFromBefore);
     }
 
-    public void insertColumns(final int startIndex, final int endIndex, final boolean inheritFromBefore) throws IOException {
+    public void insertColumns(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
         insertRowsColumns(Dimension.COLUMNS.getValue(), startIndex, endIndex, inheritFromBefore);
     }
 
@@ -164,11 +164,11 @@ public class SpreadSheet {
         range.setDimension(dimension);
         range.setStartIndex(startIndex);
         range.setEndIndex(endIndex);
-        requests.add(new Request().setInsertDimension(new InsertDimensionRequest().setInheritFromBefore(inheritFromBefore).setRange(range)));
-
+        requests.add(new Request().setInsertDimension(new InsertDimensionRequest()
+                        .setInheritFromBefore(inheritFromBefore)
+                        .setRange(range)));
         BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
         requestBody.setRequests(requests);
-
         Sheets.Spreadsheets.BatchUpdate request = service.spreadsheets().batchUpdate(spreadsheetId, requestBody);
         BatchUpdateSpreadsheetResponse response = request.execute();
     }
