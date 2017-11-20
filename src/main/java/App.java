@@ -1,6 +1,6 @@
 import com.google.api.services.sheets.v4.Sheets;
 import com.ydanchen.handysheet.SpreadSheet;
-import com.ydanchen.handysheet.services.SheetServiceProvider;
+import com.ydanchen.handysheet.services.SheetsServiceProvider;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ public class App {
          * IMPORTANT! Make sure your sheet_client_secret.json file is present in the main/java/resources folder
          * See {@url https://developers.google.com/sheets/api/quickstart/java} for details
          */
-        Sheets service = SheetServiceProvider.createSheetsService("My Application");
+        Sheets service = SheetsServiceProvider.createSheetsService("My Application");
 
         // Create a spreadsheet
         SpreadSheet sheet = new SpreadSheet.Builder(service)
@@ -30,7 +30,7 @@ public class App {
                 .inRange("Sheet1!A1:A2")
                 .build();
 
-        // Insert one blank rows at the top of sheet
+        // Insert one blank row at the top of sheet
         sheet.insertRows(0, 1, false);
     }
 }

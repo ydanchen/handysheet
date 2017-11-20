@@ -7,7 +7,9 @@ import com.ydanchen.handysheet.enums.InputOptionValue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class provides access to the most common Google SpreadSheet operations
@@ -18,6 +20,7 @@ public class SpreadSheet {
     private Sheets service;
     private String spreadsheetId;
     private String range;
+    private InputOptionValue inputOptionValue;
 
     /**
      * Constructor
@@ -28,6 +31,7 @@ public class SpreadSheet {
         this.service = builder.service;
         this.spreadsheetId = builder.spreadsheetId;
         this.range = builder.range;
+        this.inputOptionValue = builder.inputOptionValue;
     }
 
     /**
@@ -35,8 +39,9 @@ public class SpreadSheet {
      *
      * @param range the new Range
      */
-    public void setRange(final String range) {
+    public SpreadSheet setRange(final String range) {
         this.range = range;
+        return this;
     }
 
     /**
@@ -59,39 +64,60 @@ public class SpreadSheet {
      * @throws IOException might be thrown
      */
     public Object[][] getValuesAsArray() throws IOException {
-
+        //TODO: TBD
         return null;
     }
 
     /**
-     * Set values to the spreadsheet from the List of Lists
+     * Update values on the spreadsheet from the List of Lists
+     * Range should be specified before
      *
      * @param values the values to set
      * @throws IOException might be thrown
      */
-    public void setValues(final List<List<Object>> values) throws IOException {
-        ValueRange body = new ValueRange().setValues(values);
-        UpdateValuesResponse response = service.spreadsheets().values().update(spreadsheetId, range, body)
-                .setValueInputOption(InputOptionValue.USER_ENTERED.getValue())
-                .execute();
+    public void updateValues(final List<List<Object>> values) throws IOException {
+        updateValuesApiCall(values);
     }
 
     /**
-     * Set values to the spreadsheet from the two dimensional array
+     * Update values on the spreadsheet from the two dimensional array
      *
      * @param values the values to set
      * @throws IOException might be thrown
      */
-    public void setValues(Object[][] values) throws IOException {
-        //TODO: TBD
+    public void updateValues(Object[][] values) throws IOException {
+        List<List<Object>> list = Arrays.stream(values)
+                .map(Arrays::asList)
+                .collect(Collectors.toList());
+        updateValuesApiCall(list);
     }
 
+    /**
+     * Insert new empty rows into the spreadsheet
+     *
+     * @param startIndex        row index to start from
+     * @param endIndex          row index where to end
+     * @param inheritFromBefore true to inherit range properties from dimension before,
+     *                          false to inherit range properties from dimension after.
+     *                          Can't be true if startIndex is 0!
+     * @throws IOException might be thrown
+     */
     public void insertRows(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
-        insertRowsColumns(Dimension.ROWS.getValue(), startIndex, endIndex, inheritFromBefore);
+        insertRowsColumnsApiCall(Dimension.ROWS.getValue(), startIndex, endIndex, inheritFromBefore);
     }
 
+    /**
+     * Insert new empty columns into the spreadsheet
+     *
+     * @param startIndex        row index to start from
+     * @param endIndex          row index where to end
+     * @param inheritFromBefore true to inherit range properties from dimension before,
+     *                          false to inherit range properties from dimension after
+     *                          Can't be true if startIndex is 0!
+     * @throws IOException might be thrown
+     */
     public void insertColumns(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
-        insertRowsColumns(Dimension.COLUMNS.getValue(), startIndex, endIndex, inheritFromBefore);
+        insertRowsColumnsApiCall(Dimension.COLUMNS.getValue(), startIndex, endIndex, inheritFromBefore);
     }
 
     // =====================================
@@ -105,6 +131,7 @@ public class SpreadSheet {
         private final Sheets service;
         private String spreadsheetId;
         private String range;
+        private InputOptionValue inputOptionValue;
 
         /**
          * Constructor
@@ -123,6 +150,17 @@ public class SpreadSheet {
          */
         public Builder withId(String spreadsheetId) {
             this.spreadsheetId = spreadsheetId;
+            return this;
+        }
+
+        /**
+         * Input Option Value setter
+         *
+         * @param inputOptionValue the Input Option
+         * @return builder instance
+         */
+        public Builder withInputOptionValue(InputOptionValue inputOptionValue) {
+            this.inputOptionValue = inputOptionValue;
             return this;
         }
 
@@ -152,24 +190,39 @@ public class SpreadSheet {
     // =====================================
 
     /**
+     * Inserts Rows or Columns to the spreadsheet
+     *
      * @param dimension         What we want to insert. Rows or Columns
      * @param startIndex        start index
      * @param endIndex          end index
      * @param inheritFromBefore true to inherit
      * @throws IOException will be thrown if occurs
      */
-    private void insertRowsColumns(String dimension, int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
+    private void insertRowsColumnsApiCall(String dimension, int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
         List<Request> requests = new ArrayList<>();
         DimensionRange range = new DimensionRange();
         range.setDimension(dimension);
         range.setStartIndex(startIndex);
         range.setEndIndex(endIndex);
         requests.add(new Request().setInsertDimension(new InsertDimensionRequest()
-                        .setInheritFromBefore(inheritFromBefore)
-                        .setRange(range)));
+                .setInheritFromBefore(inheritFromBefore)
+                .setRange(range)));
         BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
         requestBody.setRequests(requests);
         Sheets.Spreadsheets.BatchUpdate request = service.spreadsheets().batchUpdate(spreadsheetId, requestBody);
         BatchUpdateSpreadsheetResponse response = request.execute();
+    }
+
+    /**
+     * Update values on the sheet
+     *
+     * @param values the values to write
+     * @throws IOException will be thrown if occurs
+     */
+    private void updateValuesApiCall(List<List<Object>> values) throws IOException {
+        ValueRange body = new ValueRange().setValues(values);
+        UpdateValuesResponse response = service.spreadsheets().values().update(spreadsheetId, range, body)
+                .setValueInputOption(inputOptionValue.getValue())
+                .execute();
     }
 }
