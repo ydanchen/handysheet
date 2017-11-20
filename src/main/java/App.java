@@ -30,7 +30,7 @@ public class App {
                 .inRange("Sheet1!A1:A2")
                 .build();
 
-        // Insert 2 blank rows at the top of sheet
+        // Insert one blank rows at the top of sheet
         sheet.insertRows(0, 1, false);
     }
 }
