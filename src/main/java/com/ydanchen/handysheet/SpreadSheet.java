@@ -34,13 +34,40 @@ public class SpreadSheet {
         this.inputOptionValue = builder.inputOptionValue;
     }
 
+    //
+    // Setters
+    //
+
     /**
      * Range setter
      *
      * @param range the new Range
+     * @return current instance of the SpreadSheet
      */
     public SpreadSheet setRange(final String range) {
         this.range = range;
+        return this;
+    }
+
+    /**
+     * Spreadsheet ID setter
+     *
+     * @param spreadsheetId the id of the spreadsheet
+     * @return current instance of the SpreadSheet
+     */
+    public SpreadSheet withId(final String spreadsheetId) {
+        this.spreadsheetId = spreadsheetId;
+        return this;
+    }
+
+    /**
+     * Input Value Option setter
+     *
+     * @param inputValueOption the Input Option Value
+     * @return current instance of the SpreadSheet
+     */
+    public SpreadSheet withInputValueOption(InputOptionValue inputValueOption) {
+        this.inputOptionValue = inputValueOption;
         return this;
     }
 
