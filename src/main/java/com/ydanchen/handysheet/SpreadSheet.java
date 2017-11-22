@@ -4,6 +4,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import com.ydanchen.handysheet.enums.Dimension;
 import com.ydanchen.handysheet.enums.InputOptionValue;
+import com.ydanchen.handysheet.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,10 +79,7 @@ public class SpreadSheet {
      * @throws IOException might be thrown
      */
     public List<List<Object>> getValues() throws IOException {
-        ValueRange response = service.spreadsheets().values()
-                .get(spreadsheetId, range)
-                .execute();
-        return response.getValues();
+        return getValuesApiCall();
     }
 
     /**
@@ -91,8 +89,7 @@ public class SpreadSheet {
      * @throws IOException might be thrown
      */
     public Object[][] getValuesAsArray() throws IOException {
-        //TODO: TBD
-        return null;
+        return Utils.listOfListsToTwoDimArray(getValuesApiCall());
     }
 
     /**
@@ -115,10 +112,7 @@ public class SpreadSheet {
      * @throws IOException might be thrown
      */
     public UpdateValuesResponse updateValues(Object[][] values) throws IOException {
-        List<List<Object>> list = Arrays.stream(values)
-                .map(Arrays::asList)
-                .collect(Collectors.toList());
-        return updateValuesApiCall(list);
+        return updateValuesApiCall(Utils.twoDimArrayToListOfLists(values));
     }
 
     /**
@@ -261,5 +255,18 @@ public class SpreadSheet {
         return service.spreadsheets().values().update(spreadsheetId, range, body)
                 .setValueInputOption(inputOptionValue.getValue())
                 .execute();
+    }
+
+    /**
+     * Get values from the range specified before
+     *
+     * @return the list of list of Object
+     * @throws IOException will be thrown if occurs
+     */
+    private List<List<Object>> getValuesApiCall() throws IOException {
+        ValueRange response = service.spreadsheets().values()
+                .get(spreadsheetId, range)
+                .execute();
+        return response.getValues();
     }
 }
