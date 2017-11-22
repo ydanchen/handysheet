@@ -130,7 +130,7 @@ public class SpreadSheet {
      * @throws IOException might be thrown
      */
     public BatchUpdateSpreadsheetResponse insertRows(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
-        return insertRowsColumnsApiCall(Dimension.ROWS.getValue(), startIndex, endIndex, inheritFromBefore);
+        return insertRowsColumnsApiCall(Dimension.ROWS, startIndex, endIndex, inheritFromBefore);
     }
 
     /**
@@ -145,7 +145,7 @@ public class SpreadSheet {
      * @throws IOException might be thrown
      */
     public BatchUpdateSpreadsheetResponse insertColumns(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
-        return insertRowsColumnsApiCall(Dimension.COLUMNS.getValue(), startIndex, endIndex, inheritFromBefore);
+        return insertRowsColumnsApiCall(Dimension.COLUMNS, startIndex, endIndex, inheritFromBefore);
     }
 
     // =====================================
@@ -231,10 +231,10 @@ public class SpreadSheet {
      * @return {@link BatchUpdateSpreadsheetResponse}
      * @throws IOException will be thrown if occurs
      */
-    private BatchUpdateSpreadsheetResponse insertRowsColumnsApiCall(String dimension, int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
+    private BatchUpdateSpreadsheetResponse insertRowsColumnsApiCall(Dimension dimension, int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
         List<Request> requests = new ArrayList<>();
         DimensionRange range = new DimensionRange();
-        range.setDimension(dimension);
+        range.setDimension(dimension.getValue());
         range.setStartIndex(startIndex);
         range.setEndIndex(endIndex);
         requests.add(new Request().setInsertDimension(new InsertDimensionRequest()
