@@ -3,16 +3,16 @@ package com.ydanchen.handysheet.enums;
 /**
  * Spreadsheet Dimensions enum
  *
+ * @author Yevhen Danchenko
  * @link https://developers.google.com/sheets/api/reference/rest/v4/Dimension
  */
 public enum Dimension {
     /**
-     * Rows
+     * Represents Rows of the spreadsheet
      */
     ROWS("ROWS"),
-
     /**
-     * Columns
+     * Represents Columns of the spreadsheet
      */
     COLUMNS("COLUMNS");
 

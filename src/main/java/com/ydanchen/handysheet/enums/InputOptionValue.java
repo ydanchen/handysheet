@@ -3,6 +3,7 @@ package com.ydanchen.handysheet.enums;
 /**
  * Spreadsheet Input Option Value
  *
+ * @author Yevhen Danchenko
  * @link https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
  */
 public enum InputOptionValue {
