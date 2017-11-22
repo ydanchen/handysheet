@@ -73,7 +73,8 @@ public class SpreadSheet {
     }
 
     /**
-     * Read values from the specified spreadsheet
+     * Read values from the spreadsheet
+     * <p>The range should be specified before with {code}.inRange(){code} method
      *
      * @return the list of values
      * @throws IOException might be thrown
@@ -83,7 +84,8 @@ public class SpreadSheet {
     }
 
     /**
-     * Read values from the specified spreadsheet and returns them as two dimensional array
+     * Read values from the spreadsheet and returns them as two dimensional array
+     * <p>The range should be specified before with {code}.inRange(){code} method
      *
      * @return the readed values
      * @throws IOException might be thrown
@@ -94,7 +96,7 @@ public class SpreadSheet {
 
     /**
      * Update values on the spreadsheet from the List of Lists
-     * Range should be specified before
+     * <p>The range should be specified before with {code}.inRange(){code} method
      *
      * @param values the values to set
      * @return {@link UpdateValuesResponse}
@@ -105,7 +107,8 @@ public class SpreadSheet {
     }
 
     /**
-     * Update values on the spreadsheet from the two dimensional array
+     * Update values on the spreadsheet with the values taking from the two dimensional array
+     * <p>The range should be specified before with {code}.inRange(){code} method
      *
      * @param values the values to set
      * @return {@link UpdateValuesResponse}

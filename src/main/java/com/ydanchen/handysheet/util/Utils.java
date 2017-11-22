@@ -13,7 +13,7 @@ public class Utils {
     /**
      * Converts two dimensional array of Objects to List of Lists of Objects
      *
-     * @param values two dimensional array of Objects
+     * @param values two dimensional array of Objects to convert
      * @return List of Lists of Objects
      */
     public static List<List<Object>> twoDimArrayToListOfLists(Object[][] values) {
@@ -25,12 +25,12 @@ public class Utils {
     /**
      * Converts List of Lists of objects to two dimensional array of Objects
      *
-     * @param values List of Lists of Objects
+     * @param values List of Lists of Objects to convert
      * @return two dimensional array of Objects
      */
     public static Object[][] listOfListsToTwoDimArray(List<List<Object>> values) {
         return values.stream()
-                .map(l -> l.stream().toArray(Object[]::new))
+                .map(v -> v.stream().toArray(Object[]::new))
                 .toArray(Object[][]::new);
     }
 }
