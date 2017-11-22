@@ -43,9 +43,9 @@ public class SpreadSheet {
      * Range setter
      *
      * @param range the new Range
-     * @return current instance of the SpreadSheet
+     * @return current instance of the {@link SpreadSheet}
      */
-    public SpreadSheet setRange(final String range) {
+    public SpreadSheet inRange(final String range) {
         this.range = range;
         return this;
     }
@@ -54,7 +54,7 @@ public class SpreadSheet {
      * Spreadsheet ID setter
      *
      * @param spreadsheetId the id of the spreadsheet
-     * @return current instance of the SpreadSheet
+     * @return current instance of the {@link SpreadSheet}
      */
     public SpreadSheet withId(final String spreadsheetId) {
         this.spreadsheetId = spreadsheetId;
@@ -65,7 +65,7 @@ public class SpreadSheet {
      * Input Value Option setter
      *
      * @param inputValueOption the Input Option Value
-     * @return current instance of the SpreadSheet
+     * @return current instance of the {@link SpreadSheet}
      */
     public SpreadSheet withInputValueOption(InputOptionValue inputValueOption) {
         this.inputOptionValue = inputValueOption;
@@ -74,7 +74,7 @@ public class SpreadSheet {
 
     /**
      * Read values from the spreadsheet
-     * <p>The range should be specified before with {code}.inRange(){code} method
+     * <p>The range should be specified before with {@code .inRange()} method
      *
      * @return the list of values
      * @throws IOException might be thrown
@@ -85,7 +85,7 @@ public class SpreadSheet {
 
     /**
      * Read values from the spreadsheet and returns them as two dimensional array
-     * <p>The range should be specified before with {code}.inRange(){code} method
+     * <p>The range should be specified before with {@code .inRange()} method
      *
      * @return the readed values
      * @throws IOException might be thrown
@@ -96,7 +96,7 @@ public class SpreadSheet {
 
     /**
      * Update values on the spreadsheet from the List of Lists
-     * <p>The range should be specified before with {code}.inRange(){code} method
+     * <p>The range should be specified before with {@code .inRange()} method
      *
      * @param values the values to set
      * @return {@link UpdateValuesResponse}
