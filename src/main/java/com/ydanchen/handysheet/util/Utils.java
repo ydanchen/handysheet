@@ -29,11 +29,8 @@ public class Utils {
      * @return two dimensional array of Objects
      */
     public static Object[][] listOfListsToTwoDimArray(List<List<Object>> values) {
-        Object[][] array = new Object[values.size()][];
-        int i = 0;
-        for (List<Object> nestedValues : values) {
-            array[i++] = nestedValues.toArray(new Object[nestedValues.size()]);
-        }
-        return array;
+        return values.stream()
+                .map(l -> l.stream().toArray(Object[]::new))
+                .toArray(Object[][]::new);
     }
 }
