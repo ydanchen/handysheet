@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
  *
  * @author Yevhen Danchenko
  */
-public class Utils {
+public final class Utils {
     /**
      * Converts two dimensional array of Objects to List of Lists of Objects
      *

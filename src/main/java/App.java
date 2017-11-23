@@ -1,5 +1,6 @@
 import com.google.api.services.sheets.v4.Sheets;
 import com.ydanchen.handysheet.SpreadSheet;
+import com.ydanchen.handysheet.enums.InputOptionValue;
 import com.ydanchen.handysheet.services.SheetsServiceProvider;
 
 import java.io.IOException;
@@ -31,16 +32,25 @@ public class App {
                 {"A3", "B3", "C3"}
         };
 
-        // Create a spreadsheet
-        SpreadSheet sheet = new SpreadSheet.Builder(service)
-                .withId(TEST_SHEET)
-                .inRange("Sheet1!A1:C3")
-                .build();
+        // Open a spreadsheet
+        SpreadSheet sheet = new SpreadSheet(service).withId(TEST_SHEET);
 
-        // Write values to the sheet
-        sheet.updateValues(values);
+        // Write values on sheet "Sheet1" in range "A1:C3"
+        sheet
+                .onSheet("Sheet1")
+                .inRange("A1:C3")
+                .updateValues(values);
+
+        // Append some value to the end of the sheet
+        Object[][] appendValues = {{"one", "two", "three"}};
+        sheet
+                .onSheet("Sheet1")
+                .inRange("A4:E4")
+                .withInputValueOption(InputOptionValue.RAW)
+                .appendValues(appendValues);
 
         // Insert one blank row at the top of sheet
+        // Starting from row #0 to row #1
         sheet.insertRows(0, 1, false);
     }
 }

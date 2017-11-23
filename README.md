@@ -1,4 +1,4 @@
-# Simple wrapper for Google Sheets API
+# Simple DSL to work with Google Sheets API
  This library provides a layer for easy work with Google Spreadsheets. For example:
  
 ```

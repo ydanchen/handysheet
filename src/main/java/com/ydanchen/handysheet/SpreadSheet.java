@@ -14,39 +14,50 @@ import java.util.stream.Collectors;
 
 /**
  * This class provides access to the most common Google SpreadSheet operations
+ * Built over Google Spreadsheet API v4
  *
  * @author Yevhen Danchenko
  */
 public class SpreadSheet {
+    private final static String EXC_MARK = "!";
     private Sheets service;
     private String spreadsheetId;
+    private String sheet;
     private String range;
-    private InputOptionValue inputOptionValue;
+    private InputOptionValue inputOptionValue = InputOptionValue.USER_ENTERED;
 
     /**
      * Constructor
      *
-     * @param builder {@link Builder}
+     * @param service an authorized Sheets API client service
      */
-    private SpreadSheet(Builder builder) {
-        this.service = builder.service;
-        this.spreadsheetId = builder.spreadsheetId;
-        this.range = builder.range;
-        this.inputOptionValue = builder.inputOptionValue;
+    public SpreadSheet(Sheets service) {
+        this.service = service;
     }
 
-    //
+    // =====================================
     // Setters
-    //
+    // =====================================
 
     /**
      * Range setter
      *
-     * @param range the new Range
+     * @param range the new Range. Should match pattern like "A1:E4"
      * @return current instance of the {@link SpreadSheet}
      */
-    public SpreadSheet inRange(final String range) {
+    public SpreadSheet inRange(String range) {
         this.range = range;
+        return this;
+    }
+
+    /**
+     * Sheet setter
+     *
+     * @param sheet the name of the sheet. Default sheet name is usual "Sheet1"
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet onSheet(String sheet) {
+        this.sheet = sheet;
         return this;
     }
 
@@ -56,7 +67,7 @@ public class SpreadSheet {
      * @param spreadsheetId the id of the spreadsheet
      * @return current instance of the {@link SpreadSheet}
      */
-    public SpreadSheet withId(final String spreadsheetId) {
+    public SpreadSheet withId(String spreadsheetId) {
         this.spreadsheetId = spreadsheetId;
         return this;
     }
@@ -71,6 +82,10 @@ public class SpreadSheet {
         this.inputOptionValue = inputValueOption;
         return this;
     }
+
+    // =====================================
+    // Operations
+    // =====================================
 
     /**
      * Read values from the spreadsheet
@@ -102,7 +117,7 @@ public class SpreadSheet {
      * @return {@link UpdateValuesResponse}
      * @throws IOException might be thrown
      */
-    public UpdateValuesResponse updateValues(final List<List<Object>> values) throws IOException {
+    public UpdateValuesResponse updateValues(List<List<Object>> values) throws IOException {
         return updateValuesApiCall(values);
     }
 
@@ -116,6 +131,30 @@ public class SpreadSheet {
      */
     public UpdateValuesResponse updateValues(Object[][] values) throws IOException {
         return updateValuesApiCall(Utils.twoDimArrayToListOfLists(values));
+    }
+
+    /**
+     * Append values at the end of specified range
+     * <p>The range should be specified before with {code}.inRange(){code} method
+     *
+     * @param values the values to append
+     * @return {@link AppendValuesResponse}
+     * @throws IOException might be thrown
+     */
+    public AppendValuesResponse appendValues(List<List<Object>> values) throws IOException {
+        return appendValuesApiCall(values);
+    }
+
+    /**
+     * Append values at the end of specified range
+     * <p>The range should be specified before with {code}.inRange(){code} method
+     *
+     * @param values the values to append
+     * @return {@link AppendValuesResponse}
+     * @throws IOException might be thrown
+     */
+    public AppendValuesResponse appendValues(Object[][] values) throws IOException {
+        return appendValuesApiCall(Utils.twoDimArrayToListOfLists(values));
     }
 
     /**
@@ -149,75 +188,6 @@ public class SpreadSheet {
     }
 
     // =====================================
-    // Builders
-    // =====================================
-
-    /**
-     * Spreadsheet Builder
-     */
-    public static class Builder {
-        private final Sheets service;
-        private String spreadsheetId;
-        private String range;
-        /**
-         * Default value is set to USER_ENTERED
-         * See {@link InputOptionValue} for details
-         */
-        private InputOptionValue inputOptionValue = InputOptionValue.USER_ENTERED;
-
-        /**
-         * Constructor
-         *
-         * @param service an authorized Sheets API client service
-         */
-        public Builder(Sheets service) {
-            this.service = service;
-        }
-
-        /**
-         * Spreadsheet Id setter
-         *
-         * @param spreadsheetId the id of the spreadsheet
-         * @return builder instance
-         */
-        public Builder withId(String spreadsheetId) {
-            this.spreadsheetId = spreadsheetId;
-            return this;
-        }
-
-        /**
-         * Input Option Value setter
-         *
-         * @param inputOptionValue the Input Option
-         * @return builder instance
-         */
-        public Builder withInputOptionValue(InputOptionValue inputOptionValue) {
-            this.inputOptionValue = inputOptionValue;
-            return this;
-        }
-
-        /**
-         * Sheet range setter
-         *
-         * @param range the range
-         * @return builder instance
-         */
-        public Builder inRange(String range) {
-            this.range = range;
-            return this;
-        }
-
-        /**
-         * Build a SpreadSheet instance
-         *
-         * @return new instance of com.ydanchen.handysheets.apps.spreadsheet.SpreadSheet class
-         */
-        public SpreadSheet build() {
-            return new SpreadSheet(this);
-        }
-    }
-
-    // =====================================
     // Private methods
     // =====================================
 
@@ -233,10 +203,10 @@ public class SpreadSheet {
      */
     private BatchUpdateSpreadsheetResponse insertRowsColumnsApiCall(Dimension dimension, int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
         List<Request> requests = new ArrayList<>();
-        DimensionRange range = new DimensionRange();
-        range.setDimension(dimension.getValue());
-        range.setStartIndex(startIndex);
-        range.setEndIndex(endIndex);
+        DimensionRange range = new DimensionRange()
+                .setDimension(dimension.getValue())
+                .setStartIndex(startIndex)
+                .setEndIndex(endIndex);
         requests.add(new Request().setInsertDimension(new InsertDimensionRequest()
                 .setInheritFromBefore(inheritFromBefore)
                 .setRange(range)));
@@ -244,6 +214,27 @@ public class SpreadSheet {
         requestBody.setRequests(requests);
         Sheets.Spreadsheets.BatchUpdate request = service.spreadsheets().batchUpdate(spreadsheetId, requestBody);
         return request.execute();
+    }
+
+    /**
+     * Delete Rows and Columns
+     * TODO: complete this
+     * @param dimension
+     * @param startIndex
+     * @param endIndex
+     * @return
+     * @throws IOException
+     */
+    private BatchUpdateSpreadsheetResponse deleteRowsColumnsApiCall(Dimension dimension, int startIndex, int endIndex) throws IOException {
+        List<Request> requests = new ArrayList<>();
+        DimensionRange range = new DimensionRange()
+                .setDimension(dimension.getValue())
+                .setStartIndex(startIndex)
+                .setEndIndex(endIndex);
+        DeleteDimensionRequest deleteDimensionRequest = new DeleteDimensionRequest();
+        deleteDimensionRequest.setRange(range);
+        BatchUpdateSpreadsheetRequest content = new BatchUpdateSpreadsheetRequest();
+        return null;
     }
 
     /**
@@ -255,7 +246,21 @@ public class SpreadSheet {
      */
     private UpdateValuesResponse updateValuesApiCall(List<List<Object>> values) throws IOException {
         ValueRange body = new ValueRange().setValues(values);
-        return service.spreadsheets().values().update(spreadsheetId, range, body)
+        return service.spreadsheets().values().update(spreadsheetId, sheet + EXC_MARK + range, body)
+                .setValueInputOption(inputOptionValue.getValue())
+                .execute();
+    }
+
+    /**
+     * Append values in the sheet
+     *
+     * @param values the values to write
+     * @return {@link AppendValuesResponse}
+     * @throws IOException will be thrown if occurs
+     */
+    private AppendValuesResponse appendValuesApiCall(List<List<Object>> values) throws IOException {
+        ValueRange body = new ValueRange().setValues(values);
+        return service.spreadsheets().values().append(spreadsheetId, sheet + EXC_MARK + range, body)
                 .setValueInputOption(inputOptionValue.getValue())
                 .execute();
     }
@@ -268,7 +273,7 @@ public class SpreadSheet {
      */
     private List<List<Object>> getValuesApiCall() throws IOException {
         ValueRange response = service.spreadsheets().values()
-                .get(spreadsheetId, range)
+                .get(spreadsheetId, sheet + EXC_MARK + range)
                 .execute();
         return response.getValues();
     }
