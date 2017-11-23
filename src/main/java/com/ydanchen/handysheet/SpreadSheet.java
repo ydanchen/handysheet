@@ -8,9 +8,7 @@ import com.ydanchen.handysheet.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class provides access to the most common Google SpreadSheet operations
