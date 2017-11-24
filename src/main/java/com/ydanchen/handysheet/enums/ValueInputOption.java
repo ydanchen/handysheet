@@ -6,7 +6,7 @@ package com.ydanchen.handysheet.enums;
  * @author Yevhen Danchenko
  * @link https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
  */
-public enum InputOptionValue {
+public enum ValueInputOption {
     /**
      * The values the user has entered will not be parsed and will be stored as-is.
      */
@@ -26,7 +26,7 @@ public enum InputOptionValue {
      *
      * @param value the value of the enum
      */
-    InputOptionValue(final String value) {
+    ValueInputOption(final String value) {
         this.value = value;
     }
 

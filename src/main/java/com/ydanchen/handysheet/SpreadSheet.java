@@ -3,7 +3,7 @@ package com.ydanchen.handysheet;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import com.ydanchen.handysheet.enums.Dimension;
-import com.ydanchen.handysheet.enums.InputOptionValue;
+import com.ydanchen.handysheet.enums.ValueInputOption;
 import com.ydanchen.handysheet.util.Utils;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * This class provides access to the most common Google SpreadSheet operations
- * Built over Google Spreadsheet API v4
+ * Built over the Google Spreadsheet API v4
  *
  * @author Yevhen Danchenko
  */
@@ -22,7 +22,7 @@ public class SpreadSheet {
     private String spreadsheetId;
     private String sheet;
     private String range;
-    private InputOptionValue inputOptionValue = InputOptionValue.USER_ENTERED;
+    private ValueInputOption valueInputOption = ValueInputOption.USER_ENTERED;
     private Dimension dimension;
     private int startIndex;
     private int endIndex;
@@ -70,7 +70,7 @@ public class SpreadSheet {
      *              Default sheet name in the new created spreadsheet is usual "Sheet1"
      * @return current instance of the {@link SpreadSheet}
      */
-    public SpreadSheet useTab(String sheet) {
+    public SpreadSheet onTab(String sheet) {
         this.sheet = sheet;
         return this;
     }
@@ -87,13 +87,13 @@ public class SpreadSheet {
     }
 
     /**
-     * Input Value Option setter
+     * Value Input Option setter
      *
-     * @param inputValueOption the Input Option Value
+     * @param valueInputValue the Value Input Option {@link ValueInputOption}
      * @return current instance of the {@link SpreadSheet}
      */
-    public SpreadSheet withInputValueOption(InputOptionValue inputValueOption) {
-        this.inputOptionValue = inputValueOption;
+    public SpreadSheet withValueInputOption(ValueInputOption valueInputValue) {
+        this.valueInputOption = valueInputValue;
         return this;
     }
 
@@ -272,7 +272,7 @@ public class SpreadSheet {
     private UpdateValuesResponse updateValuesApiCall(List<List<Object>> values) throws IOException {
         ValueRange body = new ValueRange().setValues(values);
         return service.spreadsheets().values().update(spreadsheetId, sheet + EXC_MARK + range, body)
-                .setValueInputOption(inputOptionValue.getValue())
+                .setValueInputOption(valueInputOption.getValue())
                 .execute();
     }
 
@@ -286,7 +286,7 @@ public class SpreadSheet {
     private AppendValuesResponse appendValuesApiCall(List<List<Object>> values) throws IOException {
         ValueRange body = new ValueRange().setValues(values);
         return service.spreadsheets().values().append(spreadsheetId, sheet + EXC_MARK + range, body)
-                .setValueInputOption(inputOptionValue.getValue())
+                .setValueInputOption(valueInputOption.getValue())
                 .execute();
     }
 

@@ -1,7 +1,7 @@
 import com.google.api.services.sheets.v4.Sheets;
 import com.ydanchen.handysheet.SpreadSheet;
 import com.ydanchen.handysheet.enums.Dimension;
-import com.ydanchen.handysheet.enums.InputOptionValue;
+import com.ydanchen.handysheet.enums.ValueInputOption;
 import com.ydanchen.handysheet.services.SheetsServiceProvider;
 
 import java.io.IOException;
@@ -38,22 +38,22 @@ public class App {
 
         // Write values on sheet "Sheet1" in range "A1:C3"
         sheet
-                .useTab("Sheet1")
+                .onTab("Sheet1")
                 .toRange("A1:C3")
                 .writeValues(values);
 
         // Append some value to the end of the sheet
         Object[][] appendValues = {{"one", "two", "three"}};
         sheet
-                .useTab("Sheet1")
+                .onTab("Sheet1")
                 .toRange("A4:E4")
-                .withInputValueOption(InputOptionValue.RAW)
+                .withValueInputOption(ValueInputOption.RAW)
                 .appendValues(appendValues);
 
         // Insert one blank row at the top of sheet
         // Starting from row #0 to row #1
         sheet
-                .useTab("Sheet1")
+                .onTab("Sheet1")
                 .select(Dimension.ROWS)
                 .from(0)
                 .to(1)
