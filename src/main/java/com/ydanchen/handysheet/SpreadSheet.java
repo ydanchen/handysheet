@@ -23,6 +23,9 @@ public class SpreadSheet {
     private String sheet;
     private String range;
     private InputOptionValue inputOptionValue = InputOptionValue.USER_ENTERED;
+    private Dimension dimension;
+    private int startIndex;
+    private int endIndex;
 
     /**
      * Constructor
@@ -34,27 +37,40 @@ public class SpreadSheet {
     }
 
     // =====================================
-    // Setters
+    // DSL methods
     // =====================================
 
     /**
      * Range setter
+     * <p>This one is for writing semantic
      *
      * @param range the new Range. Should match pattern like "A1:E4"
      * @return current instance of the {@link SpreadSheet}
      */
-    public SpreadSheet inRange(String range) {
+    public SpreadSheet toRange(String range) {
         this.range = range;
         return this;
     }
 
     /**
-     * Sheet setter
+     * Range setter
+     * <p>This one is for reading semantic
      *
-     * @param sheet the name of the sheet. Default sheet name is usual "Sheet1"
+     * @param range the new Range. Should match pattern like "A1:E4"
      * @return current instance of the {@link SpreadSheet}
      */
-    public SpreadSheet onSheet(String sheet) {
+    public SpreadSheet fromRange(String range) {
+        return toRange(range);
+    }
+
+    /**
+     * Sheet (tab) setter
+     *
+     * @param sheet the name of the sheet (tab).
+     *              Default sheet name in the new created spreadsheet is usual "Sheet1"
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet useTab(String sheet) {
         this.sheet = sheet;
         return this;
     }
@@ -81,13 +97,46 @@ public class SpreadSheet {
         return this;
     }
 
+    /**
+     * Dimension setter. To select Rows or Columns
+     *
+     * @param dimension the dimension to set
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet select(Dimension dimension) {
+        this.dimension = dimension;
+        return this;
+    }
+
+    /**
+     * Start index setter for dimensions
+     *
+     * @param startIndex the start index. Can't be lower than 0
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet from(int startIndex) {
+        this.startIndex = startIndex;
+        return this;
+    }
+
+    /**
+     * End index setter for dimensions
+     *
+     * @param endIndex the end index. Can't be lower than 0
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet to(int endIndex) {
+        this.endIndex = endIndex;
+        return this;
+    }
+
     // =====================================
     // Operations
     // =====================================
 
     /**
      * Read values from the spreadsheet
-     * <p>The range should be specified before with {@code .inRange()} method
+     * <p>The range should be specified before with {@code .toRange()} method
      *
      * @return the list of values
      * @throws IOException might be thrown
@@ -98,7 +147,7 @@ public class SpreadSheet {
 
     /**
      * Read values from the spreadsheet and returns them as two dimensional array
-     * <p>The range should be specified before with {@code .inRange()} method
+     * <p>The range should be specified before with {@code .toRange()} method
      *
      * @return the readed values
      * @throws IOException might be thrown
@@ -108,32 +157,32 @@ public class SpreadSheet {
     }
 
     /**
-     * Update values on the spreadsheet from the List of Lists
-     * <p>The range should be specified before with {@code .inRange()} method
+     * Write values on the spreadsheet from the List of Lists
+     * <p>The range should be specified before with {@code .toRange()} or {@code .fromRange()} methods
      *
      * @param values the values to set
      * @return {@link UpdateValuesResponse}
      * @throws IOException might be thrown
      */
-    public UpdateValuesResponse updateValues(List<List<Object>> values) throws IOException {
+    public UpdateValuesResponse writeValues(List<List<Object>> values) throws IOException {
         return updateValuesApiCall(values);
     }
 
     /**
-     * Update values on the spreadsheet with the values taking from the two dimensional array
-     * <p>The range should be specified before with {code}.inRange(){code} method
+     * Write values on the spreadsheet with the values taking from the two dimensional array
+     * <p>The range should be specified before with {@code .toRange()} or {@code .fromRange()} methods
      *
      * @param values the values to set
      * @return {@link UpdateValuesResponse}
      * @throws IOException might be thrown
      */
-    public UpdateValuesResponse updateValues(Object[][] values) throws IOException {
+    public UpdateValuesResponse writeValues(Object[][] values) throws IOException {
         return updateValuesApiCall(Utils.twoDimArrayToListOfLists(values));
     }
 
     /**
      * Append values at the end of specified range
-     * <p>The range should be specified before with {code}.inRange(){code} method
+     * <p>The range should be specified before with {code}.toRange(){code} method
      *
      * @param values the values to append
      * @return {@link AppendValuesResponse}
@@ -145,7 +194,7 @@ public class SpreadSheet {
 
     /**
      * Append values at the end of specified range
-     * <p>The range should be specified before with {code}.inRange(){code} method
+     * <p>The range should be specified before with {code}.toRange(){code} method
      *
      * @param values the values to append
      * @return {@link AppendValuesResponse}
@@ -156,33 +205,16 @@ public class SpreadSheet {
     }
 
     /**
-     * Insert new empty rows into the spreadsheet
+     * Insert new empty rows or columns into the spreadsheet
      *
-     * @param startIndex        row index to start from
-     * @param endIndex          row index where to end
      * @param inheritFromBefore true to inherit range properties from dimension before,
      *                          false to inherit range properties from dimension after.
      *                          Can't be true if startIndex is 0!
      * @return {@link BatchUpdateSpreadsheetResponse}
      * @throws IOException might be thrown
      */
-    public BatchUpdateSpreadsheetResponse insertRows(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
-        return insertRowsColumnsApiCall(Dimension.ROWS, startIndex, endIndex, inheritFromBefore);
-    }
-
-    /**
-     * Insert new empty columns into the spreadsheet
-     *
-     * @param startIndex        row index to start from
-     * @param endIndex          row index where to end
-     * @param inheritFromBefore true to inherit range properties from dimension before,
-     *                          false to inherit range properties from dimension after
-     *                          Can't be true if startIndex is 0!
-     * @return {@link BatchUpdateSpreadsheetResponse}
-     * @throws IOException might be thrown
-     */
-    public BatchUpdateSpreadsheetResponse insertColumns(int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
-        return insertRowsColumnsApiCall(Dimension.COLUMNS, startIndex, endIndex, inheritFromBefore);
+    public BatchUpdateSpreadsheetResponse insertEmpty(boolean inheritFromBefore) throws IOException {
+        return insertRowsColumnsApiCall(inheritFromBefore);
     }
 
     // =====================================
@@ -192,14 +224,11 @@ public class SpreadSheet {
     /**
      * Inserts Rows or Columns to the spreadsheet
      *
-     * @param dimension         What we want to insert. Rows or Columns
-     * @param startIndex        start index
-     * @param endIndex          end index
      * @param inheritFromBefore true to inherit
      * @return {@link BatchUpdateSpreadsheetResponse}
      * @throws IOException will be thrown if occurs
      */
-    private BatchUpdateSpreadsheetResponse insertRowsColumnsApiCall(Dimension dimension, int startIndex, int endIndex, boolean inheritFromBefore) throws IOException {
+    private BatchUpdateSpreadsheetResponse insertRowsColumnsApiCall(boolean inheritFromBefore) throws IOException {
         List<Request> requests = new ArrayList<>();
         DimensionRange range = new DimensionRange()
                 .setDimension(dimension.getValue())
@@ -217,13 +246,11 @@ public class SpreadSheet {
     /**
      * Delete Rows and Columns
      * TODO: complete this
-     * @param dimension
-     * @param startIndex
-     * @param endIndex
-     * @return
+     *
+     * @return {@link BatchUpdateSpreadsheetRequest}
      * @throws IOException
      */
-    private BatchUpdateSpreadsheetResponse deleteRowsColumnsApiCall(Dimension dimension, int startIndex, int endIndex) throws IOException {
+    private BatchUpdateSpreadsheetResponse deleteRowsColumnsApiCall() throws IOException {
         List<Request> requests = new ArrayList<>();
         DimensionRange range = new DimensionRange()
                 .setDimension(dimension.getValue())
