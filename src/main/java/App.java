@@ -34,34 +34,34 @@ public class App {
         };
 
         // Open a spreadsheet
-        SpreadSheet sheet = new SpreadSheet(service).withId(TEST_SHEET);
+        SpreadSheet spreadsheet = new SpreadSheet(service).withId(TEST_SHEET);
 
-        // Write values on sheet "Sheet1" in range "A1:C3"
-        sheet
-                .onTab("Sheet1")
+        // Write values on spreadsheet "Sheet1" in range "A1:C3"
+        spreadsheet
+                .onSheet("Sheet1")
                 .toRange("A1:C3")
                 .writeValues(values);
 
-        // Append some value to the end of the sheet
+        // Append some value to the end of the spreadsheet
         Object[][] appendValues = {{"one", "two", "three"}};
-        sheet
-                .onTab("Sheet1")
+        spreadsheet
+                .onSheet("Sheet1")
                 .toRange("A4:E4")
                 .withValueInputOption(ValueInputOption.RAW)
                 .appendValues(appendValues);
 
-        // Insert one blank row at the top of sheet
+        // Insert one blank row at the top of spreadsheet
         // Starting from row #0 to row #1
-        sheet
-                .onTab("Sheet1")
+        spreadsheet
+                .onSheet("Sheet1")
                 .select(Dimension.ROWS)
                 .from(0)
                 .to(1)
                 .insertEmpty();
 
         // Delete row #2 (B)
-        sheet
-                .onTab("Sheet1")
+        spreadsheet
+                .onSheet("Sheet1")
                 .select(Dimension.COLUMNS)
                 .from(2)
                 .to(3)

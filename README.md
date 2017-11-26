@@ -6,13 +6,13 @@
 Sheets service = SheetsServiceProvider.createSheetsService(APPLICATION_NAME);
 
 // Create a spreadsheet 
-SpreadSheet sheet = new SpreadSheet(service).withId(SPREEDSHEET_ID);
+SpreadSheet spreadsheet = new SpreadSheet(service).withId(SPREEDSHEET_ID);
 
 // Write values
-sheet.onTab("Sheet1").toRange("A1:C3").writeValues(values);
+spreadsheet.onSheet("Sheet1").toRange("A1:C3").writeValues(values);
 
 // Insert one blank row at the top of a sheet       
-sheet.onTab("Sheet1").select(Dimension.ROWS).from(0).to(1).insertEmpty();        
+spreadsheet.onSheet("Sheet1").select(Dimension.ROWS).from(0).to(1).insertEmpty();        
 ```
 # License
 This project is licensed under the terms of the MIT license.

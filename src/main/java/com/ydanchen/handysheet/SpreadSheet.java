@@ -9,6 +9,7 @@ import com.ydanchen.handysheet.util.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class provides access to the most common Google SpreadSheet operations
@@ -21,7 +22,7 @@ public class SpreadSheet {
 
     private Sheets service;
     private String spreadsheetId;
-    private String tab;
+    private String sheet;
     private String range;
     private ValueInputOption valueInputOption = ValueInputOption.USER_ENTERED;
     private Boolean inheritFromBefore = false;
@@ -66,14 +67,14 @@ public class SpreadSheet {
     }
 
     /**
-     * Tab setter
+     * Sheet setter
      *
-     * @param tab the name of the tab.
-     *            Default tab name in the new created spreadsheet is usual "Sheet1"
+     * @param sheet the name of the sheet.
+     *              Default sheet name in the new created spreadsheet is usual "Sheet1"
      * @return current instance of the {@link SpreadSheet}
      */
-    public SpreadSheet onTab(String tab) {
-        this.tab = tab;
+    public SpreadSheet onSheet(String sheet) {
+        this.sheet = sheet;
         return this;
     }
 
@@ -240,6 +241,33 @@ public class SpreadSheet {
     }
 
     // =====================================
+    // Accessors
+    // =====================================
+
+    /**
+     * Return all Sheets in the spreadsheet
+     *
+     * @return list of all Sheets in the spreadsheet
+     * @throws IOException might be thrown
+     */
+    public List<Sheet> getSheets() throws IOException {
+        return service.spreadsheets().get(spreadsheetId).execute().getSheets();
+    }
+
+    /**
+     * Return names of all sheets in the spreadsheet as List of String
+     *
+     * @return all sheet names as a List of String
+     * @throws IOException might be thrown
+     */
+    public List<String> getSheetsNames() throws IOException {
+        return getSheets()
+                .stream()
+                .map(v -> v.getProperties().getTitle())
+                .collect(Collectors.toList());
+    }
+
+    // =====================================
     // Private methods (API calls)
     // =====================================
 
@@ -258,8 +286,8 @@ public class SpreadSheet {
         requests.add(new Request().setInsertDimension(new InsertDimensionRequest()
                 .setInheritFromBefore(inheritFromBefore)
                 .setRange(range)));
-        BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
-        requestBody.setRequests(requests);
+        BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest()
+                .setRequests(requests);
         return service.spreadsheets().batchUpdate(spreadsheetId, requestBody).execute();
     }
 
@@ -276,13 +304,13 @@ public class SpreadSheet {
                 .setStartIndex(startIndex)
                 .setEndIndex(endIndex);
         requests.add(new Request().setDeleteDimension(new DeleteDimensionRequest().setRange(range)));
-        BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
-        requestBody.setRequests(requests);
+        BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest()
+                .setRequests(requests);
         return service.spreadsheets().batchUpdate(spreadsheetId, requestBody).execute();
     }
 
     /**
-     * Update values on the tab
+     * Update values on the sheet
      *
      * @param values the values to write
      * @return {@link UpdateValuesResponse}
@@ -290,13 +318,13 @@ public class SpreadSheet {
      */
     private UpdateValuesResponse updateValuesApiCall(List<List<Object>> values) throws IOException {
         ValueRange body = new ValueRange().setValues(values);
-        return service.spreadsheets().values().update(spreadsheetId, getRangeWithTab(tab, range), body)
+        return service.spreadsheets().values().update(spreadsheetId, getRangeWithSheet(sheet, range), body)
                 .setValueInputOption(valueInputOption.getValue())
                 .execute();
     }
 
     /**
-     * Append values in the tab
+     * Append values in the sheet
      *
      * @param values the values to write
      * @return {@link AppendValuesResponse}
@@ -304,7 +332,7 @@ public class SpreadSheet {
      */
     private AppendValuesResponse appendValuesApiCall(List<List<Object>> values) throws IOException {
         ValueRange body = new ValueRange().setValues(values);
-        return service.spreadsheets().values().append(spreadsheetId, getRangeWithTab(tab, range), body)
+        return service.spreadsheets().values().append(spreadsheetId, getRangeWithSheet(sheet, range), body)
                 .setValueInputOption(valueInputOption.getValue())
                 .execute();
     }
@@ -317,19 +345,19 @@ public class SpreadSheet {
      */
     private List<List<Object>> getValuesApiCall() throws IOException {
         ValueRange response = service.spreadsheets().values()
-                .get(spreadsheetId, getRangeWithTab(tab, range))
+                .get(spreadsheetId, getRangeWithSheet(sheet, range))
                 .execute();
         return response.getValues();
     }
 
     /**
-     * Concatenates tab name and range to provide range name suitable for API, like "Sheet1!A1:B2"
+     * Concatenates sheet name and range to provide range name suitable for API, like "Sheet1!A1:B2"
      *
-     * @param tab   the tab name. The name of default tab is "Sheet1"
+     * @param sheet the sheet name. The name of default sheet is "Sheet1"
      * @param range the range, e.g. "A1:B2"
      * @return the range suitable for Google Sheets API
      */
-    private static String getRangeWithTab(String tab, String range) {
-        return tab + EXCLAMATION_MARK + range;
+    private static String getRangeWithSheet(String sheet, String range) {
+        return sheet + EXCLAMATION_MARK + range;
     }
 }
