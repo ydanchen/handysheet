@@ -57,6 +57,14 @@ public class App {
                 .select(Dimension.ROWS)
                 .from(0)
                 .to(1)
-                .insertEmpty(false);
+                .insertEmpty();
+
+        // Delete row #2 (B)
+        sheet
+                .onTab("Sheet1")
+                .select(Dimension.COLUMNS)
+                .from(2)
+                .to(3)
+                .delete();
     }
 }

@@ -17,12 +17,14 @@ import java.util.List;
  * @author Yevhen Danchenko
  */
 public class SpreadSheet {
-    private final static String EXC_MARK = "!";
+    private final static String EXCLAMATION_MARK = "!";
+
     private Sheets service;
     private String spreadsheetId;
-    private String sheet;
+    private String tab;
     private String range;
     private ValueInputOption valueInputOption = ValueInputOption.USER_ENTERED;
+    private Boolean inheritFromBefore = false;
     private Dimension dimension;
     private int startIndex;
     private int endIndex;
@@ -64,14 +66,14 @@ public class SpreadSheet {
     }
 
     /**
-     * Sheet (tab) setter
+     * Tab setter
      *
-     * @param sheet the name of the sheet (tab).
-     *              Default sheet name in the new created spreadsheet is usual "Sheet1"
+     * @param tab the name of the tab.
+     *            Default tab name in the new created spreadsheet is usual "Sheet1"
      * @return current instance of the {@link SpreadSheet}
      */
-    public SpreadSheet onTab(String sheet) {
-        this.sheet = sheet;
+    public SpreadSheet onTab(String tab) {
+        this.tab = tab;
         return this;
     }
 
@@ -127,6 +129,19 @@ public class SpreadSheet {
      */
     public SpreadSheet to(int endIndex) {
         this.endIndex = endIndex;
+        return this;
+    }
+
+    /**
+     * Inherit range properties form dimension before setter
+     *
+     * @param inheritFromBefore true to inherit range properties from dimension before,
+     *                          false to inherit range properties from dimension after.
+     *                          Can't be true if startIndex is 0!
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet inheritFromBefore(Boolean inheritFromBefore) {
+        this.inheritFromBefore = inheritFromBefore;
         return this;
     }
 
@@ -207,28 +222,34 @@ public class SpreadSheet {
     /**
      * Insert new empty rows or columns into the spreadsheet
      *
-     * @param inheritFromBefore true to inherit range properties from dimension before,
-     *                          false to inherit range properties from dimension after.
-     *                          Can't be true if startIndex is 0!
      * @return {@link BatchUpdateSpreadsheetResponse}
      * @throws IOException might be thrown
      */
-    public BatchUpdateSpreadsheetResponse insertEmpty(boolean inheritFromBefore) throws IOException {
-        return insertRowsColumnsApiCall(inheritFromBefore);
+    public BatchUpdateSpreadsheetResponse insertEmpty() throws IOException {
+        return insertRowsColumnsApiCall();
+    }
+
+    /**
+     * Delete rows or cloumns
+     *
+     * @return {@link BatchUpdateSpreadsheetResponse}
+     * @throws IOException might be thrown
+     */
+    public BatchUpdateSpreadsheetResponse delete() throws IOException {
+        return deleteRowsColumnsApiCall();
     }
 
     // =====================================
-    // Private methods
+    // Private methods (API calls)
     // =====================================
 
     /**
      * Inserts Rows or Columns to the spreadsheet
      *
-     * @param inheritFromBefore true to inherit
      * @return {@link BatchUpdateSpreadsheetResponse}
      * @throws IOException will be thrown if occurs
      */
-    private BatchUpdateSpreadsheetResponse insertRowsColumnsApiCall(boolean inheritFromBefore) throws IOException {
+    private BatchUpdateSpreadsheetResponse insertRowsColumnsApiCall() throws IOException {
         List<Request> requests = new ArrayList<>();
         DimensionRange range = new DimensionRange()
                 .setDimension(dimension.getValue())
@@ -239,16 +260,14 @@ public class SpreadSheet {
                 .setRange(range)));
         BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
         requestBody.setRequests(requests);
-        Sheets.Spreadsheets.BatchUpdate request = service.spreadsheets().batchUpdate(spreadsheetId, requestBody);
-        return request.execute();
+        return service.spreadsheets().batchUpdate(spreadsheetId, requestBody).execute();
     }
 
     /**
-     * Delete Rows and Columns
-     * TODO: complete this
+     * Delete Rows and Columns on the spreadsheet
      *
      * @return {@link BatchUpdateSpreadsheetRequest}
-     * @throws IOException
+     * @throws IOException will be thrown if occurs
      */
     private BatchUpdateSpreadsheetResponse deleteRowsColumnsApiCall() throws IOException {
         List<Request> requests = new ArrayList<>();
@@ -256,14 +275,14 @@ public class SpreadSheet {
                 .setDimension(dimension.getValue())
                 .setStartIndex(startIndex)
                 .setEndIndex(endIndex);
-        DeleteDimensionRequest deleteDimensionRequest = new DeleteDimensionRequest();
-        deleteDimensionRequest.setRange(range);
-        BatchUpdateSpreadsheetRequest content = new BatchUpdateSpreadsheetRequest();
-        return null;
+        requests.add(new Request().setDeleteDimension(new DeleteDimensionRequest().setRange(range)));
+        BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
+        requestBody.setRequests(requests);
+        return service.spreadsheets().batchUpdate(spreadsheetId, requestBody).execute();
     }
 
     /**
-     * Update values on the sheet
+     * Update values on the tab
      *
      * @param values the values to write
      * @return {@link UpdateValuesResponse}
@@ -271,13 +290,13 @@ public class SpreadSheet {
      */
     private UpdateValuesResponse updateValuesApiCall(List<List<Object>> values) throws IOException {
         ValueRange body = new ValueRange().setValues(values);
-        return service.spreadsheets().values().update(spreadsheetId, sheet + EXC_MARK + range, body)
+        return service.spreadsheets().values().update(spreadsheetId, getRangeWithTab(tab, range), body)
                 .setValueInputOption(valueInputOption.getValue())
                 .execute();
     }
 
     /**
-     * Append values in the sheet
+     * Append values in the tab
      *
      * @param values the values to write
      * @return {@link AppendValuesResponse}
@@ -285,7 +304,7 @@ public class SpreadSheet {
      */
     private AppendValuesResponse appendValuesApiCall(List<List<Object>> values) throws IOException {
         ValueRange body = new ValueRange().setValues(values);
-        return service.spreadsheets().values().append(spreadsheetId, sheet + EXC_MARK + range, body)
+        return service.spreadsheets().values().append(spreadsheetId, getRangeWithTab(tab, range), body)
                 .setValueInputOption(valueInputOption.getValue())
                 .execute();
     }
@@ -298,8 +317,19 @@ public class SpreadSheet {
      */
     private List<List<Object>> getValuesApiCall() throws IOException {
         ValueRange response = service.spreadsheets().values()
-                .get(spreadsheetId, sheet + EXC_MARK + range)
+                .get(spreadsheetId, getRangeWithTab(tab, range))
                 .execute();
         return response.getValues();
+    }
+
+    /**
+     * Concatenates tab name and range to provide range name suitable for API, like "Sheet1!A1:B2"
+     *
+     * @param tab   the tab name. The name of default tab is "Sheet1"
+     * @param range the range, e.g. "A1:B2"
+     * @return the range suitable for Google Sheets API
+     */
+    private static String getRangeWithTab(String tab, String range) {
+        return tab + EXCLAMATION_MARK + range;
     }
 }
