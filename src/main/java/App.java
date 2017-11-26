@@ -66,5 +66,11 @@ public class App {
                 .from(2)
                 .to(3)
                 .delete();
+        // Merge range B2:D4
+        spreadsheet
+                .onSheet("Sheet1")
+                .from(2,2)
+                .to(4,4)
+                .mergeCells();
     }
 }

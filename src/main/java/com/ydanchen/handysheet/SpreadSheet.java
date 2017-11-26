@@ -3,6 +3,7 @@ package com.ydanchen.handysheet;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import com.ydanchen.handysheet.enums.Dimension;
+import com.ydanchen.handysheet.enums.MergeType;
 import com.ydanchen.handysheet.enums.ValueInputOption;
 import com.ydanchen.handysheet.util.Utils;
 
@@ -27,8 +28,13 @@ public class SpreadSheet {
     private ValueInputOption valueInputOption = ValueInputOption.USER_ENTERED;
     private Boolean inheritFromBefore = false;
     private Dimension dimension;
+    private MergeType mergeType = MergeType.MERGE_ALL;
     private int startIndex;
     private int endIndex;
+    private int startRowIndex;
+    private int startColumnIndex;
+    private int endRowIndex;
+    private int endColumnIndex;
 
     /**
      * Constructor
@@ -123,6 +129,19 @@ public class SpreadSheet {
     }
 
     /**
+     * Start indexes for methods when complete range is required, e.g. mergeCells()
+     *
+     * @param startColumnIndex the column start index. Can't be lower than 0
+     * @param startRowIndex    the row start index. Can't be lower than 0
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet from(int startColumnIndex, int startRowIndex) {
+        this.startColumnIndex = startColumnIndex;
+        this.startRowIndex = startRowIndex;
+        return this;
+    }
+
+    /**
      * End index setter for dimensions
      *
      * @param endIndex the end index. Can't be lower than 0
@@ -130,6 +149,19 @@ public class SpreadSheet {
      */
     public SpreadSheet to(int endIndex) {
         this.endIndex = endIndex;
+        return this;
+    }
+
+    /**
+     * End indexes for methods when complete range is required, e.g. mergeCells()
+     *
+     * @param endColumnIndex the column end index. Can't be lower than 0
+     * @param endRowIndex    the row end index. Can't be lower than 0
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet to(int endColumnIndex, int endRowIndex) {
+        this.endColumnIndex = endColumnIndex;
+        this.endRowIndex = endRowIndex;
         return this;
     }
 
@@ -143,6 +175,17 @@ public class SpreadSheet {
      */
     public SpreadSheet inheritFromBefore(Boolean inheritFromBefore) {
         this.inheritFromBefore = inheritFromBefore;
+        return this;
+    }
+
+    /**
+     * Merge type setter.
+     *
+     * @param mergeType specifies how cells should be merged.
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet mergeBy(MergeType mergeType) {
+        this.mergeType = mergeType;
         return this;
     }
 
@@ -268,6 +311,13 @@ public class SpreadSheet {
     }
 
     // =====================================
+    // Formatting
+    // =====================================
+    public BatchUpdateSpreadsheetResponse mergeCells() throws IOException {
+        return MergeCellsApiCall();
+    }
+
+    // =====================================
     // Private methods (API calls)
     // =====================================
 
@@ -348,6 +398,27 @@ public class SpreadSheet {
                 .get(spreadsheetId, getRangeWithSheet(sheet, range))
                 .execute();
         return response.getValues();
+    }
+
+    /**
+     * Merge cells on the grid
+     *
+     * @return {@link BatchUpdateSpreadsheetResponse}
+     * @throws IOException will be thrown if occurs
+     */
+    private BatchUpdateSpreadsheetResponse MergeCellsApiCall() throws IOException {
+        List<Request> requests = new ArrayList<>();
+        GridRange range = new GridRange()
+                .setStartColumnIndex(startColumnIndex)
+                .setStartRowIndex(startRowIndex)
+                .setEndColumnIndex(endColumnIndex)
+                .setEndRowIndex(endRowIndex);
+        requests.add(new Request().setMergeCells(new MergeCellsRequest()
+                .setMergeType(mergeType.getValue())
+                .setRange(range)));
+        BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest()
+                .setRequests(requests);
+        return service.spreadsheets().batchUpdate(spreadsheetId, requestBody).execute();
     }
 
     /**
