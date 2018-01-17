@@ -45,7 +45,7 @@ public class App {
                 .byOrder(SortOrder.ASCENDING)
                 .sort();
 
-        /*// Write values on spreadsheet "Sheet1" in range "A1:C3"
+        // Write values on spreadsheet "Sheet1" in range "A1:C3"
         spreadsheet
                 .onSheet("Sheet1")
                 .toRange("A1:C3")
@@ -81,6 +81,6 @@ public class App {
                 .onSheet("Sheet1")
                 .from(2,2)
                 .to(4,4)
-                .mergeCells();*/
+                .mergeCells();
     }
 }
