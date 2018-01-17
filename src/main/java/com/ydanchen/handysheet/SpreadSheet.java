@@ -4,6 +4,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import com.ydanchen.handysheet.enums.Dimension;
 import com.ydanchen.handysheet.enums.MergeType;
+import com.ydanchen.handysheet.enums.SortOrder;
 import com.ydanchen.handysheet.enums.ValueInputOption;
 import com.ydanchen.handysheet.util.Utils;
 
@@ -29,6 +30,7 @@ public class SpreadSheet {
     private Boolean inheritFromBefore = false;
     private Dimension dimension;
     private MergeType mergeType = MergeType.MERGE_ALL;
+    private SortOrder sortOrder = SortOrder.ASCENDING;
     private int startIndex;
     private int endIndex;
     private int startRowIndex;
@@ -189,6 +191,17 @@ public class SpreadSheet {
         return this;
     }
 
+    /**
+     * Sort order setter
+     *
+     * @param sortOrder the order data should be sorted.
+     * @return current instance of the {@link SpreadSheet}
+     */
+    public SpreadSheet byOrder(SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
+        return this;
+    }
+
     // =====================================
     // Operations
     // =====================================
@@ -283,6 +296,16 @@ public class SpreadSheet {
         return deleteRowsColumnsApiCall();
     }
 
+    /**
+     * Sort the values on the sheet
+     *
+     * @return {@link BatchUpdateSpreadsheetResponse}
+     * @throws IOException might be thrown
+     */
+    public BatchUpdateSpreadsheetResponse sort() throws IOException {
+        return sortApiCall();
+    }
+
     // =====================================
     // Accessors
     // =====================================
@@ -313,9 +336,17 @@ public class SpreadSheet {
     // =====================================
     // Formatting
     // =====================================
+
+    /**
+     * Merge cells on sheet
+     *
+     * @return {@link BatchUpdateSpreadsheetResponse}
+     * @throws IOException might be thrown
+     */
     public BatchUpdateSpreadsheetResponse mergeCells() throws IOException {
         return MergeCellsApiCall();
     }
+
 
     // =====================================
     // Private methods (API calls)
@@ -416,6 +447,33 @@ public class SpreadSheet {
         requests.add(new Request().setMergeCells(new MergeCellsRequest()
                 .setMergeType(mergeType.getValue())
                 .setRange(range)));
+        BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest()
+                .setRequests(requests);
+        return service.spreadsheets().batchUpdate(spreadsheetId, requestBody).execute();
+    }
+
+    /**
+     * Sort range on the spreadsheet
+     *
+     * @return {@link BatchUpdateSpreadsheetRequest}
+     * @throws IOException will be thrown if occurs
+     */
+    private BatchUpdateSpreadsheetResponse sortApiCall() throws IOException {
+        List<Request> requests = new ArrayList<>();
+        List<SortSpec> sortSpecs = new ArrayList<>();
+        sortSpecs.add(
+                new SortSpec()
+                .setSortOrder(sortOrder.getValue())
+                .setDimensionIndex((dimension.equals(Dimension.COLUMNS) ? 0 : 1))
+        );
+        GridRange range = new GridRange()
+                .setStartColumnIndex(startColumnIndex)
+                .setStartRowIndex(startRowIndex)
+                .setEndColumnIndex(endColumnIndex)
+                .setEndRowIndex(endRowIndex);
+        requests.add(new Request().setSortRange(new SortRangeRequest()
+                .setRange(range)
+                .setSortSpecs(sortSpecs)));
         BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest()
                 .setRequests(requests);
         return service.spreadsheets().batchUpdate(spreadsheetId, requestBody).execute();
