@@ -51,7 +51,7 @@ public class App {
                 .toRange("A1:C3")
                 .writeValues(values);
 
-        // Append some value to the end of the spreadsheet
+        // Append some value at the end of the spreadsheet
         Object[][] appendValues = {{"one", "two", "three"}};
         spreadsheet
                 .onSheet("Sheet1")
