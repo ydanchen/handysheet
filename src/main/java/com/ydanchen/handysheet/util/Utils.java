@@ -72,7 +72,7 @@ public final class Utils {
     }
 
     /**
-     * Converts numerical indexes to a literal range, e.g. (1, 1, 2, 2) --> A1:B2
+     * Converts numeric indexes to a literal range, e.g. (1, 1, 2, 2) --> A1:B2
      *
      * @param startColumn start column index
      * @param startRow    start row index
@@ -85,7 +85,7 @@ public final class Utils {
     }
 
     /**
-     * Converts numerical range instance to a literal
+     * Converts numeric range instance to a literal
      *
      * @param range {@link NumericRange}
      * @return the formatted range, e.g. 'A1:C3'
@@ -98,7 +98,7 @@ public final class Utils {
     }
 
     /**
-     * Converts literal range to a numerical
+     * Converts literal range to a numeric
      *
      * @param range formatted range like 'A1:C3"
      * @return the instance of {@link NumericRange}
