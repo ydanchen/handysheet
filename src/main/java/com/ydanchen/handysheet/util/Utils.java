@@ -123,7 +123,6 @@ public final class Utils {
      * @return the letter representation
      */
     private static String columnIndexToLetter(int index) {
-        index++;
         int temp;
         StringBuilder letter = new StringBuilder();
         while (index > 0) {
