@@ -150,9 +150,9 @@ public final class Utils {
     /**
      * Gets a numeric part from a range token
      * e.g. (A100 -> 100) or (B4 -> 4)
-     * [A1:B2] is a range and [A1] and [B2] are the range tokens
      *
-     * @param token the part of a range
+     * @param token the part of a range,
+     *              where [A1:B2] is a range and [A1] and [B2] are the range tokens
      * @return the numeric part of the token
      */
     private static String getNumericPart(String token) {
@@ -166,9 +166,9 @@ public final class Utils {
     /**
      * Gets a letter part from a range token
      * e.g. (A100 -> A) or (AZ14 -> AZ)
-     * [A1:B2] is a range and [A1] and [B2] are the range tokens
      *
-     * @param token the part of a range
+     * @param token the part of a range,
+     *              where [A1:B2] is a range and [A1] and [B2] are the range tokens
      * @return the literal part of the token
      */
     private static String getLetterPart(String token) {
