@@ -148,7 +148,7 @@ public final class Utils {
     }
 
     /**
-     * Gets a numeric part of a range token
+     * Gets a numeric part from a range token
      * e.g. (A100 -> 100) or (B4 -> 4)
      * [A1:B2] is a range and [A1] and [B2] are the range tokens
      *
@@ -164,7 +164,7 @@ public final class Utils {
     }
 
     /**
-     * Gets a letter part of the range token
+     * Gets a letter part from a range token
      * e.g. (A100 -> A) or (AZ14 -> AZ)
      * [A1:B2] is a range and [A1] and [B2] are the range tokens
      *
