@@ -126,9 +126,9 @@ public final class Utils {
         int temp;
         StringBuilder letter = new StringBuilder();
         while (index > 0) {
-            temp = (index - 1) % 26;
-            letter.insert(0, (char) (temp + 65));
-            index = (index - temp - 1) / 26;
+            temp = (index - 1) % ALPHABET_LENGTH;
+            letter.insert(0, (char) (temp + CHAR_A));
+            index = (index - temp - 1) / ALPHABET_LENGTH;
         }
         return letter.toString();
     }
