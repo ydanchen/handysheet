@@ -14,5 +14,33 @@ spreadsheet.onSheet("Sheet1").toRange("A1:C3").writeValues(values);
 // Insert one blank row at the top of a sheet       
 spreadsheet.onSheet("Sheet1").select(Dimension.ROWS).from(0).to(1).insertEmpty();        
 ```
+
+# More examples
+Append values:
+```java
+spreadsheet
+       .onSheet("Sheet1")
+       .toRange("A4:E4")
+       .withValueInputOption(ValueInputOption.RAW)
+       .appendValues(values);
+```
+Insert empty rows or columns:
+```java
+spreadsheet
+       .onSheet("Sheet1")
+       .select(Dimension.ROWS)
+       .from(0)
+       .to(1)
+       .insertEmpty();
+```
+Merge cells:
+```java
+spreadsheet
+       .onSheet("Sheet1")
+       .from(2,2)
+       .to(4,4)
+       .mergeCells();
+```
+
 # License
 This project is licensed under the terms of the MIT license.
